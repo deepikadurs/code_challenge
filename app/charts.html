@@ -1,0 +1,57 @@
+<div ng-controller="chart.ChartCtrl" >
+	<center><h2><i class="fa fa-code" aria-hidden="true"></i> Coding Challenge</h2></center>
+	<div class="row">
+		<div class="col col-sm-8 col-md-8 col-lg-8">
+			<div class="row">
+				<div class="col col-sm-3 col-md-3 col-lg-3">
+		   			<label>Chart Type</label>
+					<select name="chartStyle" id="chartStyle" ng-model="challenge.chart" required ng-options="user.value as user.label for user in challenge.chartStyle" class="form-control">
+						<option disabled value="">Select Chart style</option>
+		    		</select>
+		    	</div>
+			</div>
+			<br/>
+			<div class="row form-group">
+				<div class="col col-sm-4 col-md-4 col-lg-4">
+			    	<label class="control-label"><i class="fa fa-calendar"></i> Start Datetime</label><br>
+			    	<div class="form-group">
+					    <input type="datetime-local" size="10" class="form-control" ng-model="challenge.startDate">
+					</div>
+				</div>
+				<div class="col col-sm-4 col-md-4 col-lg-4">
+			    	<label class="control-label"><i class="fa fa-calendar"></i> End Datetime</label><br>
+			    	<div class="form-group">
+					    <input type="datetime-local" size="10" class="form-control" ng-model="challenge.endDate">
+					</div>
+				</div>
+				<div class="col col-sm-2 col-md-2 col-lg-2">
+					<label class="control-label"></label><br>
+					<button type="button" class="btn btn-primary pull-left" ng-click="generateChart()">Generate Chart</button>
+				</div>
+			</div>
+			
+			<br/>
+		   	<div class="row">
+		   		<div style="position: relative;" ng-if="challenge.chart == 'bar'">
+					<!-- <div qms-Loading loading-Big="true" is-Loading="dashboard.loading.delinquentComplaintBreakdown"></div>
+					<div ng-include src="'app/dashboard/delinquentComplaintBreakdown.html'" onload="dashboard.loading.delinquentComplaintBreakdown=false"></div> -->
+					<div ng-include src="'app/barChart.html'"></div>
+				</div>
+		   	</div>
+   		</div>
+
+		<div class="col col-sm-4 col-md-4 col-lg-4 pull-right" ng-init="btnClicked = false">
+    		<button type="button" class="btn btn-primary pull-right" ng-click="btnClicked=!btnClicked">Add record</button><br/><br/>
+    		<div class="panel panel-default" ng-show="btnClicked">
+  				<div class="panel-body">A Basic Panel
+  				<p>What is Lorem Ipsum?
+				Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+				Why do we use it?
+				It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. m Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+				</p>
+  				</div>
+			</div>
+    	</div>
+   	</div>
+</div>

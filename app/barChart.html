@@ -1,0 +1,12 @@
+<div class="row" ng-controller="chart.BarChartCtrl">
+	<!-- <h3><center><strong>Time Series</strong></center></h3> -->
+	<div ng-if="barChart.showGraph && (barChart.graphHeight <= 350)">
+		<div google-chart chart="bChart.catalogItemChart" ></div>
+	</div>
+	<div style="overflow-y: scroll; overflow-x: hidden; width: 600px; height: 350px;" ng-if="barChart.showGraph && (barChart.graphHeight > 350)">
+		<div google-chart chart="bChart.catalogItemChart" ></div>
+	</div>
+	<div ng-if="!barChart.showGraph">
+		<center> -  No Data  - </center> <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	</div>
+</div>
