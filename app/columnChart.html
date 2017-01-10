@@ -1,0 +1,12 @@
+<div class="row" ng-controller="chart.ColumnChartCtrl">
+	<!-- <h3><center><strong>Time Series</strong></center></h3> -->
+	<div ng-if="columnChart.showGraph && (columnChart.graphHeight <= 350)">
+		<div google-chart chart="cChart.catalogItemChart" ></div>
+	</div>
+	<div style="overflow-y: scroll; overflow-x: hidden; width: 600px; height: 350px;" ng-if="columnChart.showGraph && (columnChart.graphHeight > 350)">
+		<div google-chart chart="cChart.catalogItemChart" ></div>
+	</div>
+	<div ng-if="!columnChart.showGraph">
+		<center> -  No Data  - </center> <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+	</div>
+</div>

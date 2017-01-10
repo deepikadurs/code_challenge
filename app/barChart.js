@@ -4,14 +4,13 @@ chartuiApp.controller('chart.BarChartCtrl', ['$scope', '$q', '$rootScope', '$htt
         $scope.barChart = {
             barColor1 : '#4f81bd',
             barColor2 : '#c0504d',
-            filter : {
-                "timePeriod" : null
-            },
             data : {},
             role_1 : null,
             role_2 : null,
             showGraph : false,
-            graphHeight : null
+            graphHeight : null,
+            field : 'memory_usage',
+            field2 : null
         }
 
         $scope.$on('chartLoad', function(e, initTimeStamp) {
@@ -22,86 +21,76 @@ chartuiApp.controller('chart.BarChartCtrl', ['$scope', '$q', '$rootScope', '$htt
                     params: {'starttime': initTimeStamp.startDate, 'endtime': initTimeStamp.endDate}
                 }).then(function(response) {
                     console.log(JSON.stringify(response));
+                    $scope.barChart.data = response.data;console.log("build chart 1 " + JSON.stringify($scope.barChart.data));
+                    if($scope.barChart.data !== [] || $scope.barChart.data[0] !== null) {
+                        $scope.barChart.showGraph = true;console.log("build chart " + JSON.stringify($scope.barChart.data));
+                        googleChartApiPromise.then(buildDataTable);
+                    } else {
+                        $scope.barChart.showGraph = false;
+                    }
                 });
             }
         });
 
-        // $scope.$on('dashboardLoad', function(e, duration) {
-        //     $scope.barChart.filter.timePeriod = duration;
-        //     DashboardService.getbarChart($scope.barChart.filter).then(function(serverResponse) {
-        //         $scope.barChart.data = serverResponse.data;
-        //         $scope.barChart.role_1 = $scope.barChart.data[0].role;
-        //         $scope.barChart.role_2 = null;
-        //         angular.forEach($scope.barChart.data, function(item) {
-        //             $scope.barChart.role_2 = (item.role != $scope.barChart.role_1) ? item.role : $scope.barChart.role_2;
-        //         });
-        //         if(itnIsEmpty($scope.barChart.data)) {
-        //             $scope.barChart.showGraph = false;
-        //         } else {
-        //             $scope.barChart.showGraph = true;
-        //             googleChartApiPromise.then(buildDataTable);
-        //         }
-        //     });
-        // });
+        
+        $scope.$on('chartModify', function(e, modifyFields) {
+            $scope.barChart.barColor1 = modifyFields.markerColor;
+            $scope.barChart.barColor2 = modifyFields.markerColor2;
+            if(modifyFields.title != null){
+                $scope.bChart.catalogItemChart.options.title = modifyFields.title;
+            }
+            $scope.barChart.field2 = modifyFields.field2;
+            // if(modifyFields.labels != null){
+            //     $scope.bChart.catalogItemChart.options.vAxis.ticks = angular.copy(modifyFields.labels.split(','));
+            // }
+            $scope.barChart.field = modifyFields.field; 
+            googleChartApiPromise.then(buildDataTable);
+        });
 
-        $scope.loadDelinquentComplaints = function() {
+        $scope.$on('saveBarChart', function(e, dataRecord) {console.log("in");
+            $http({
+                url: '/saveRecord', 
+                method: "POST",
+                params: dataRecord
+             }).then(function(response) {
+                console.log("saved record " + JSON.stringify(response));
+                if(response.data == 'success') {
+                    console.log("data " + JSON.stringify(response.config.params));
+                    $scope.barChart.data.push(response.config.params);
+                    googleChartApiPromise.then(buildDataTable);
+                }
+            });
+        });
 
-$http({
-    url: '/getTimeStamps', 
-    method: "GET",
-    params: {'starttime': 'yyyy:mm:dd hh:mm:ss', 'endtime': 'yyyy:mm:dd hh:mm:ss'}
- }).then(function(response) {
-                    console.log(JSON.stringify(response));
-                });
+        $scope.loadAPI = function() {
+            // GET API
+            $http({
+                url: '/getTimeStamps', 
+                method: "GET",
+                params: {'starttime': 'yyyy:mm:dd hh:mm:ss', 'endtime': 'yyyy:mm:dd hh:mm:ss'}
+             }).then(function(response) {
+                console.log(JSON.stringify(response));
+            });
 
-
-$http({
-    url: '/saveRecord', 
-    method: "POST",
-    params: {'starttime': 'yyyy:mm:dd hh:mm:ss', 'endtime': 'yyyy:mm:dd hh:mm:ss'}
- }).then(function(response) {
-                    console.log(JSON.stringify(response));
-                });
-
-
-
-            // var resourceTimeStamps = $resource('/getTimeStamps');
-            // return resourceTimeStamps.get({
-            //         'starttime': starttime,
-            //         'endtime' : endtime
-            //     }).$promise.then(function(response) {
-            //         console.log(JSON.stringify(response.data));
-            //         return response.data;
-            //     }, function(err) {
-            //         console.log("REST Error >>>>>>" + err);
-            //         return err;
-            //     });
-
-            // DashboardService.getbarChart(starttime, endtime).then(function(serverResponse) {
-            //     $scope.barChart.data = serverResponse.data;
-            //     // $scope.barChart.role_1 = $scope.barChart.data[0].role;
-            //     // $scope.barChart.role_2 = null;
-            //     // angular.forEach($scope.barChart.data, function(item) {
-            //     //     $scope.barChart.role_2 = (item.role != $scope.barChart.role_1) ? item.role : $scope.barChart.role_2;
-            //     // });
-            //     // if(dataIsEmpty($scope.barChart.data)) {
-            //     //     $scope.barChart.showGraph = false;
-            //     // } else {
-            //     //     $scope.barChart.showGraph = true;
-            //     //     googleChartApiPromise.then(buildDataTable);
-            //     // }
-            // });            
-        }
-
+             // POST API
+            $http({
+                url: '/saveRecord', 
+                method: "POST",
+                params: {'starttime': 'yyyy:mm:dd hh:mm:ss', 'endtime': 'yyyy:mm:dd hh:mm:ss'}
+             }).then(function(response) {
+                console.log(JSON.stringify(response));
+            });
+        }       
+        
         $scope.bChart = {
             catalogItemChart: {
                 type: "BarChart",
                 options: {
-                    title: 'Delinquent Complaint Breakdown',
+                    title: 'Time series chart',
                     titleTextStyle: {
                         fontSize: 22
                     },
-                    titlePosition: 'none',
+                    // titlePosition: 'none',
                     displayExactValues: true,
                     // width: 600,
                     // height: 400, 
@@ -116,7 +105,7 @@ $http({
                     fontSize: '14',
                     bar: {groupWidth: 18},
                     bars: 'vertical',
-                    chartArea: {left:150, top:50, bottom:10},                  
+                    chartArea: {left:150, top:100, bottom:10},                  
                     tooltip : {
                         ignoreBounds: true
                         // isHtml: true
@@ -130,99 +119,52 @@ $http({
             $scope.bChart.catalogItemChart.data = new google.visualization.DataTable();
             $scope.barChart.graphHeight = ($scope.barChart.data.length * 30);
             ($scope.barChart.graphHeight > 350) ? $scope.bChart.catalogItemChart.options.height = $scope.barChart.graphHeight : 
-            $scope.bChart.catalogItemChart.options.height = 350;
+            $scope.bChart.catalogItemChart.options.height = 350;console.log("build chart " + JSON.stringify($scope.barChart.data));
             var graphData = [];
-            graphData.push(['Status', '# Complaint Cases', { role: 'style' }]);
-            var barColor = null;
-            angular.forEach($scope.barChart.data, function(item) {
-                if(item.role == $scope.barChart.role_1) {
-                    barColor = $scope.barChart.barColor1;
-                } else {
-                    barColor = $scope.barChart.barColor2;
-                }
-                graphData.push([item.name, item.delinquentComplaints, barColor]);
-            });
+            
+            var barColor1 = $scope.barChart.barColor1;
+            var barColor2 = $scope.barChart.barColor2;
+            if($scope.barChart.field == 'memory_usage' && $scope.barChart.field2==null) {
+                graphData.push(['Timestamp', $scope.barChart.field, { role: 'style' }]);
+                angular.forEach($scope.barChart.data, function(item) {
+                    graphData.push([item.timestamp, item.memory_usage, barColor1]);
+                });
+            } else if ($scope.barChart.field == 'memory_available' && $scope.barChart.field2==null) {
+                graphData.push(['Timestamp', $scope.barChart.field, { role: 'style' }]);
+                angular.forEach($scope.barChart.data, function(item) {
+                    graphData.push([item.timestamp, item.memory_available, barColor1]);
+                });
+            } else if ($scope.barChart.field == 'cpu_usage' && $scope.barChart.field2==null) {
+                graphData.push(['Timestamp', $scope.barChart.field, { role: 'style' }]);
+                angular.forEach($scope.barChart.data, function(item) {
+                    graphData.push([item.timestamp, item.cpu_usage, barColor1]);
+                });
+            } else if ($scope.barChart.field == 'network_throughput' && $scope.barChart.field2==null) {
+                graphData.push(['Timestamp', 'network_throughput_in', { role: 'style' }, 'network_throughput_out', { role: 'style' }]);
+                angular.forEach($scope.barChart.data, function(item) {
+                    graphData.push([item.timestamp, item.network_throughput.in, barColor1, item.network_throughput.out, barColor2]);
+                });
+            } else if ($scope.barChart.field == 'network_packet' && $scope.barChart.field2==null) {
+                graphData.push(['Timestamp', 'network_packet_in', { role: 'style' }, 'network_packet_out', { role: 'style' }]);
+                angular.forEach($scope.barChart.data, function(item) {
+                    graphData.push([item.timestamp, item.network_packet.in, barColor1, item.network_packet.out, barColor2]);
+                });
+            } else if ($scope.barChart.field2!=null) {
+                graphData.push(['Timestamp', $scope.barChart.field, { role: 'style' }, $scope.barChart.field2, { role: 'style' }]);
+                var f1 = $scope.barChart.field;
+                var f2 = $scope.barChart.field2;
+                angular.forEach($scope.barChart.data, function(item) {
+                    graphData.push([item.timestamp, item[f1], barColor1, item[f2], barColor2]);
+                });
+            }
             $scope.bChart.catalogItemChart.data = new google.visualization.arrayToDataTable(graphData);
         }
 
-        $scope.init = function() {
-            $scope.barChart.filter.timePeriod = 30;
-            $scope.loadDelinquentComplaints();
-        }
+        // $scope.init = function() {
+        //     $scope.loadAPI();
+        // }
 
-        $scope.init();
+        // $scope.init();
 
     }
 ]);
-
-
-
-
-
-
-
-//         $scope.chart = {
-//             wrap: null
-//         }
-
-//         $scope.testFunc = function() {
-//             // $scope.chart.wrap.setOption({'title':'Population Density (people/km^2)'});
-//             $scope.chart.wrap.setOption('height', 600);
-//             $scope.chart.wrap.setOption('overflow-y', scroll);
-//             $scope.chart.wrap.draw();
-//         }
-
-//         function buildDataTable(){
-//             // $scope.data = new google.visualization.DataTable();
-//             // Continue building the data table.
-//         itnLog("$scope.dashboard.testDelinquent " + $scope.dashboard.testDelinquent);
-
-
-// $scope.chart.wrap = new google.visualization.ChartWrapper({
-//        'chartType':'BarChart',
-//        // 'dataSourceUrl':'http://spreadsheets.google.com/tq?key=pCQbetd-CptGXxxQIG7VFIQ&pub=1',
-//        'containerId':'visualization',
-//        'dataTable': [
-//                     ['Status', '# Complaint Cases', { role: 'style' }],
-//                     ['TP_1', 50000, '#7FB2E8'],
-//                     ['DC_1', 80000, '#E8917F'],
-//                     ['TP_2', 70000, '#7FB2E8'],
-//                     ['TP_3', 60000, '#7FB2E8'],
-//                     ['DC_2', 50000, '#E8917F'],
-//                     ['SP_1', 80000, '#7FE8AA'],
-//                     ['SP_2', 60000, '#7FE8AA'],
-//                     ['TP_4', 80000, '#7FB2E8'],
-//                     ['SP_3', 50000, '#7FE8AA'],
-//                     ['DC_3', 70000, '#E8917F'],
-//                     ['DC_4', 80000, '#E8917F']
-//                     // [$scope.deepika.deeepika,$scope.deepika.deeepika,'#435462']
-//                 ],
-//        'options': {
-//                     title: 'Delinquent Complaint Breakdown',
-//                     titleTextStyle: {
-//                         fontSize: 22
-//                     },
-//                     // titlePosition: 'none',
-//                     displayExactValues: true,
-//                     // sliceVisibilityThreshold: 0,
-//                     width: 500,
-//                     height: 400, 
-//                     backgroundColor: 'transparent',
-//                     legend: { 
-//                         position: 'none',
-//                         alignment: 'center',
-//                         textStyle : {
-//                             fontSize: '14'
-//                         }
-//                     },
-//                     // bar: {groupWidth: 20},
-//                     bars: 'vertical',
-//                     // pieSliceText : 'label',                      
-//                     tooltip : {
-//                         ignoreBounds: true
-//                     //     text : 'percentage'
-//                     }
-//                 }
-//        });
-// $scope.chart.wrap.draw();
-// }

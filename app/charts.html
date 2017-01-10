@@ -1,10 +1,10 @@
 <div ng-controller="chart.ChartCtrl" >
-	<center><h2><i class="fa fa-code" aria-hidden="true"></i> Coding Challenge</h2></center>
+	<center><div class="page-header"><h2><i class="fa fa-code" aria-hidden="true"></i> Coding Challenge</h2></div></center>
 	<div class="row">
 		<div class="col col-sm-8 col-md-8 col-lg-8">
 			<div class="row">
 				<div class="col col-sm-3 col-md-3 col-lg-3">
-		   			<label>Chart Type</label>
+		   			<label><i class="fa fa-line-chart" aria-hidden="true"></i> Chart Type</label>
 					<select name="chartStyle" id="chartStyle" ng-model="challenge.chart" required ng-options="user.value as user.label for user in challenge.chartStyle" class="form-control">
 						<option disabled value="">Select Chart style</option>
 		    		</select>
@@ -29,27 +29,142 @@
 					<button type="button" class="btn btn-primary pull-left" ng-click="generateChart()">Generate Chart</button>
 				</div>
 			</div>
-			
+            <div class="row">
+                <div class="col col-sm-10 col-md-10 col-lg-10 center-block" id="ChartErrorPanel">
+                </div>
+            </div>
 			<br/>
 		   	<div class="row">
 		   		<div style="position: relative;" ng-if="challenge.chart == 'bar'">
-					<!-- <div qms-Loading loading-Big="true" is-Loading="dashboard.loading.delinquentComplaintBreakdown"></div>
-					<div ng-include src="'app/dashboard/delinquentComplaintBreakdown.html'" onload="dashboard.loading.delinquentComplaintBreakdown=false"></div> -->
 					<div ng-include src="'app/barChart.html'"></div>
+				</div>
+				<div style="position: relative;" ng-if="challenge.chart == 'line'">
+					<div ng-include src="'app/lineChart.html'"></div>
+				</div>
+				<div style="position: relative;" ng-if="challenge.chart == 'column'">
+					<div ng-include src="'app/columnChart.html'"></div>
 				</div>
 		   	</div>
    		</div>
 
-		<div class="col col-sm-4 col-md-4 col-lg-4 pull-right" ng-init="btnClicked = false">
-    		<button type="button" class="btn btn-primary pull-right" ng-click="btnClicked=!btnClicked">Add record</button><br/><br/>
-    		<div class="panel panel-default" ng-show="btnClicked">
-  				<div class="panel-body">A Basic Panel
-  				<p>What is Lorem Ipsum?
-				Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-				Why do we use it?
-				It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. m Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-				</p>
+		<div class="col col-sm-4 col-md-4 col-lg-4 pull-right" ng-init="addRecord = false;configureChart=false">
+			<div class="row">
+                <div class="col col-sm-10 col-md-10 col-lg-10 center-block" id="ChartModifyErrorPanel">
+                </div>
+            </div>
+    		<button type="button" class="btn btn-primary pull-right" ng-click="addRecord=!addRecord">Add record</button> 
+    		<span class="pull-right"><button type="button" class="btn btn-primary" ng-click="configureChart=!configureChart">Configure chart</button>&nbsp; &nbsp;&nbsp; &nbsp;</span>
+    		<br/><br/>
+    		<div class="panel panel-default" ng-show="addRecord">
+  				<div class="panel-body">
+  					<form class="form-horizontal" name="saveRecord" novalidate autocomplete="off">
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">Timestamp : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="datetime-local" size="10" class="form-control" ng-model="challenge.dataRecord.timestamp">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">Memory usage : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.memory_usage" placeholder="Memory_Usage">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">Memory available : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.memory_available" placeholder="Memory_Available">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">CPU usage : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.cpu_usage" placeholder="CPU_Usage">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">Network throughput : </label>
+	                        <div class="col-sm-3 col-md-3">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.network_throughput.in" placeholder="In">
+	                        </div>
+	                        <div class="col-sm-3 col-md-3">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.network_throughput.out" placeholder="Out">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">Network packet : </label>
+	                        <div class="col-sm-3 col-md-3">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.network_packet.in" placeholder="In">
+	                        </div>
+	                        <div class="col-sm-3 col-md-3">
+	                            <input type="text" class="form-control" ng-model="challenge.dataRecord.network_packet.out" placeholder="Out">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <span class="col-sm-4 col-md-4 control-label"></span>
+	                        <div class="col-sm-7 col-md-7">
+	                            <button type="button" class="btn btn-primary pull-left" ng-click="saveData();addRecord=!addRecord">Save</button>
+	                        </div>
+	                    </div>
+	  				</form>
+  				</div>
+			</div>
+			<div class="panel panel-default" ng-show="configureChart">
+  				<div class="panel-body">
+	  				<form class="form-horizontal" name="chartConfiguration" novalidate autocomplete="off">
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label">Title : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="text" class="form-control" ng-model="challenge.chartModifier.title" placeholder="Add title text">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <label class="col-sm-4 col-md-4 control-label" ng-hide="challenge.chartModifier.field == 'network_throughput' || challenge.chartModifier.field == 'network_packet' || challenge.plotTwoCharts">Marker color : </label>
+	                        <label class="col-sm-4 col-md-4 control-label" ng-show="challenge.chartModifier.field == 'network_throughput' || challenge.chartModifier.field == 'network_packet' || challenge.plotTwoCharts">Marker1 color : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="color" class="form-control" ng-model="challenge.chartModifier.markerColor" value="#4f81bd">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group" ng-show="challenge.chartModifier.field == 'network_throughput' || challenge.chartModifier.field == 'network_packet' || challenge.plotTwoCharts">
+	                        <label class="col-sm-4 col-md-4 control-label">Marker2 color : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="color" class="form-control" ng-model="challenge.chartModifier.markerColor2" value="#c0504d">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group" ng-if="!challenge.plotTwoCharts">
+	                        <label class="col-sm-4 col-md-4 control-label">Axis field : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <select class="form-control" name="field" placeholder="Select.. " ng-model="challenge.chartModifier.field" ng-options="field for field in challenge.fieldList">
+	                            </select>
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                    	<label class="col-sm-4 col-md-4 control-label">Plot 2 fields : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <input type="checkbox" ng-model="challenge.plotTwoCharts">
+	                        </div>
+	                    </div>
+	                    <div class="row form-group" ng-if="challenge.plotTwoCharts">
+	                        <label class="col-sm-4 col-md-4 control-label">Axis field1 : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <select class="form-control" name="field" placeholder="Select.. " ng-model="challenge.chartModifier.field" ng-options="field for field in challenge.fieldList2">
+	                            </select>
+	                        </div>
+	                    </div>
+	                    <div class="row form-group" ng-if="challenge.plotTwoCharts">
+	                        <label class="col-sm-4 col-md-4 control-label">Axis field2 : </label>
+	                        <div class="col-sm-7 col-md-7">
+	                            <select class="form-control" name="field" placeholder="Select.. " ng-model="challenge.chartModifier.field2" ng-options="field for field in challenge.fieldList2">
+	                            </select>
+	                        </div>
+	                    </div>
+	                    <div class="row form-group">
+	                        <span class="col-sm-4 col-md-4 control-label"></span>
+	                        <div class="col-sm-7 col-md-7">
+	                            <button type="button" class="btn btn-primary pull-left" ng-click="applyToChart();configureChart=!configureChart">Apply</button>
+	                        </div>
+	                    </div>
+	  				</form>
   				</div>
 			</div>
     	</div>
