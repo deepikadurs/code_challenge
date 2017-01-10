@@ -26,4 +26,3 @@ Implementation details and instructions for usage –
 
 
 Note – The application is tested on chrome browser, may not function as expected in few other browsers due to usage of certain new cascading styles.
-
